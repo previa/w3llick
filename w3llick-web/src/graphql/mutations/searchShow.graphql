@@ -1,0 +1,22 @@
+mutation SearchShow($title: String!) {
+  searchShow(title: $title) {
+    results {
+      backdrop_path
+      first_air_date
+      genre_ids
+      id
+      name
+      origin_country
+      original_language
+      original_name
+      overview
+      popularity
+      poster_path
+      vote_average
+      vote_count
+    }
+    page
+    total_results
+    total_pages
+  }
+}

@@ -1,0 +1,13 @@
+query Shows($limit: Int!, $cursor: String) {
+  shows(cursor: $cursor, limit: $limit) {
+    hasMore
+    shows {
+      id
+      createdAt
+      updatedAt
+      title
+      year
+      posterPath
+    }
+  }
+}

@@ -1,0 +1,14 @@
+query Show($id: Int!) {
+  show(id: $id) {
+    id
+    createdAt
+    updatedAt
+    title
+    year
+    posterPath
+    imdbID
+    totalSeasons
+    language
+    plot
+  }
+}

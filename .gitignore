@@ -1,0 +1,6 @@
+./w3llick-server/src/key.ts
+./w3llick-server/dist/
+./w3llick-server/node_modules/
+./w3llick-server/yarn-error.log
+./w3llick-web/.next/
+./w3llick-web/node_modules/

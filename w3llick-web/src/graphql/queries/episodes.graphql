@@ -1,0 +1,11 @@
+query Episodes($id: Int!) {
+  episodes(showID: $id) {
+    id
+    title
+    episode
+    season
+    imdbID
+    imdbRating
+    releaseDate
+  }
+}
