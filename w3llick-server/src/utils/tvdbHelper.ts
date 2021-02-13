@@ -11,7 +11,7 @@
 
 import fetch from "node-fetch";
 import { SearchResult } from "src/entities/SearchResult";
-import { TMDB_KEY } from "../constants";
+import { TMDB_KEY } from "../keys";
 
 //   show.language = json.Language;
 //   show.plot = json.Plot;
