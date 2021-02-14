@@ -1,0 +1,5 @@
+mutation AddShow($tmdb_id: Int!) {
+  addShow(tmdb_id: $tmdb_id) {
+    id
+  }
+}

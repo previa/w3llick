@@ -3,11 +3,20 @@ query Shows($limit: Int!, $cursor: String) {
     hasMore
     shows {
       id
-      createdAt
-      updatedAt
-      title
-      year
-      posterPath
+      backdrop_path
+      first_air_date
+      tmdb_id
+      in_production
+      last_air_date
+      name
+      number_of_episodes
+      number_of_seasons
+      overview
+      poster_path
+      status
+      tagline
+      vote_average
+      vote_count
     }
   }
 }

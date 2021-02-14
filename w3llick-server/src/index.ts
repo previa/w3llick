@@ -39,7 +39,7 @@ const main = async () => {
 
   app.get("/images/:id/poster", async (req, res) => {
     const show = await Show.findOne(req.params.id);
-    if (show && !show.posterPath) {
+    if (show && !show.poster_path) {
       res.sendFile(path.join(__dirname, "images", "default.png"));
     } else {
       res.sendFile(
@@ -47,7 +47,7 @@ const main = async () => {
           __dirname,
           "images",
           req.params.id,
-          show?.posterPath as string
+          show?.poster_path as string
         )
       );
     }

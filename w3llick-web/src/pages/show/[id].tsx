@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import { Layout } from "../../components/Layout";
 import { SeasonHolder } from "../../components/SeasonHolder";
 import { useEpisodesQuery, useShowQuery } from "../../generated/graphql";
@@ -28,6 +28,16 @@ const Show = ({}) => {
     },
   });
 
+  const [variables] = useState({
+    imageURL: "https://image.tmdb.org/t/p/w200",
+  });
+
+  const getThumbnail = (path: string | null | undefined): any => {
+    const _path = variables.imageURL + path;
+
+    return <Image mt={2} p={2} src={_path}></Image>;
+  };
+
   if (fetching) {
     return (
       <Layout>
@@ -37,32 +47,22 @@ const Show = ({}) => {
   }
 
   if (data?.show) {
-    const seasons = data.show.totalSeasons as number;
+    const seasons = data.show.number_of_seasons as number;
 
     return (
       <Layout>
-        <Heading>{data?.show?.title}</Heading>
-        <Text>{"(" + data?.show?.year + ")"}</Text>
+        <Heading>{data?.show?.name}</Heading>
+        <Text>{"(" + data?.show?.first_air_date.split("-")[0] + ")"}</Text>
         <Flex>
-          <Image
-            mt={2}
-            w="30%"
-            src={getPosterPath(data?.show?.id as number)}
-          ></Image>
+          {getThumbnail(data.show.poster_path)}
           <Box>
             <Text ml={2} mt={2}>
-              {data?.show.plot}
+              {data?.show.overview}
             </Text>
             <Text ml={2} mt={2}>
-              Language: {data?.show.language}
+              Seasons: {data?.show.number_of_seasons}
             </Text>
-            <Text ml={2} mt={2}>
-              IMDB ID: {data?.show.imdbID}
-            </Text>
-            <Text ml={2} mt={2}>
-              Seasons: {data?.show.totalSeasons}
-            </Text>
-            <Button ml={2} colorScheme="teal">
+            <Button ml={2} mt={2} colorScheme="teal">
               Update show
             </Button>
           </Box>

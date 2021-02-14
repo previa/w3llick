@@ -53,15 +53,20 @@ export type PaginatedShows = {
 export type Show = {
   __typename?: 'Show';
   id: Scalars['Float'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  year: Scalars['String'];
-  title: Scalars['String'];
-  posterPath?: Maybe<Scalars['String']>;
-  plot?: Maybe<Scalars['String']>;
-  language?: Maybe<Scalars['String']>;
-  imdbID?: Maybe<Scalars['String']>;
-  totalSeasons?: Maybe<Scalars['Int']>;
+  backdrop_path: Scalars['String'];
+  first_air_date: Scalars['String'];
+  tmdb_id: Scalars['Float'];
+  in_production: Scalars['Boolean'];
+  last_air_date?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  number_of_episodes: Scalars['Float'];
+  number_of_seasons: Scalars['Float'];
+  overview: Scalars['String'];
+  poster_path: Scalars['String'];
+  status: Scalars['String'];
+  tagline: Scalars['String'];
+  vote_average: Scalars['String'];
+  vote_count: Scalars['Float'];
 };
 
 export type User = {
@@ -91,7 +96,6 @@ export type Mutation = {
   addShow: Show;
   searchShow: SearchResult;
   updateShow: Show;
-  updatePoster?: Maybe<Show>;
   deleteShow: Scalars['Boolean'];
   register: UserResponse;
   login: UserResponse;
@@ -101,7 +105,7 @@ export type Mutation = {
 
 
 export type MutationAddShowArgs = {
-  title: Scalars['String'];
+  tmdb_id: Scalars['Int'];
 };
 
 
@@ -111,12 +115,6 @@ export type MutationSearchShowArgs = {
 
 
 export type MutationUpdateShowArgs = {
-  id: Scalars['Float'];
-};
-
-
-export type MutationUpdatePosterArgs = {
-  posterPath: Scalars['String'];
   id: Scalars['Float'];
 };
 
@@ -185,6 +183,19 @@ export type UsernamePasswordInput = {
 export type RegularUserFragment = (
   { __typename?: 'User' }
   & Pick<User, 'id' | 'username'>
+);
+
+export type AddShowMutationVariables = Exact<{
+  tmdb_id: Scalars['Int'];
+}>;
+
+
+export type AddShowMutation = (
+  { __typename?: 'Mutation' }
+  & { addShow: (
+    { __typename?: 'Show' }
+    & Pick<Show, 'id'>
+  ) }
 );
 
 export type LoginMutationVariables = Exact<{
@@ -284,7 +295,7 @@ export type ShowQuery = (
   { __typename?: 'Query' }
   & { show?: Maybe<(
     { __typename?: 'Show' }
-    & Pick<Show, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'year' | 'posterPath' | 'imdbID' | 'totalSeasons' | 'language' | 'plot'>
+    & Pick<Show, 'id' | 'backdrop_path' | 'first_air_date' | 'tmdb_id' | 'in_production' | 'last_air_date' | 'name' | 'number_of_episodes' | 'number_of_seasons' | 'overview' | 'poster_path' | 'status' | 'tagline' | 'vote_average' | 'vote_count'>
   )> }
 );
 
@@ -301,7 +312,7 @@ export type ShowsQuery = (
     & Pick<PaginatedShows, 'hasMore'>
     & { shows: Array<(
       { __typename?: 'Show' }
-      & Pick<Show, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'year' | 'posterPath'>
+      & Pick<Show, 'id' | 'backdrop_path' | 'first_air_date' | 'tmdb_id' | 'in_production' | 'last_air_date' | 'name' | 'number_of_episodes' | 'number_of_seasons' | 'overview' | 'poster_path' | 'status' | 'tagline' | 'vote_average' | 'vote_count'>
     )> }
   ) }
 );
@@ -312,6 +323,17 @@ export const RegularUserFragmentDoc = gql`
   username
 }
     `;
+export const AddShowDocument = gql`
+    mutation AddShow($tmdb_id: Int!) {
+  addShow(tmdb_id: $tmdb_id) {
+    id
+  }
+}
+    `;
+
+export function useAddShowMutation() {
+  return Urql.useMutation<AddShowMutation, AddShowMutationVariables>(AddShowDocument);
+};
 export const LoginDocument = gql`
     mutation Login($options: UsernamePasswordInput!) {
   login(options: $options) {
@@ -415,15 +437,20 @@ export const ShowDocument = gql`
     query Show($id: Int!) {
   show(id: $id) {
     id
-    createdAt
-    updatedAt
-    title
-    year
-    posterPath
-    imdbID
-    totalSeasons
-    language
-    plot
+    backdrop_path
+    first_air_date
+    tmdb_id
+    in_production
+    last_air_date
+    name
+    number_of_episodes
+    number_of_seasons
+    overview
+    poster_path
+    status
+    tagline
+    vote_average
+    vote_count
   }
 }
     `;
@@ -437,11 +464,20 @@ export const ShowsDocument = gql`
     hasMore
     shows {
       id
-      createdAt
-      updatedAt
-      title
-      year
-      posterPath
+      backdrop_path
+      first_air_date
+      tmdb_id
+      in_production
+      last_air_date
+      name
+      number_of_episodes
+      number_of_seasons
+      overview
+      poster_path
+      status
+      tagline
+      vote_average
+      vote_count
     }
   }
 }

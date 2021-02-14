@@ -13,10 +13,11 @@ import {
 } from "@chakra-ui/react";
 import { VariablesAreInputTypesRule } from "graphql";
 import { withUrqlClient } from "next-urql";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout } from "../components/Layout";
-import { SearchShow, useSearchShowMutation } from "../generated/graphql";
+import { SearchShow, useSearchShowMutation, useAddShowMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
+import { useRouter } from "next/router";
 
 interface addShowProps {}
 
@@ -27,7 +28,10 @@ const AddShow: React.FC<addShowProps> = ({}) => {
     imageURL: "https://image.tmdb.org/t/p/w200",
   });
 
-  const [, searchShow] = useSearchShowMutation();
+  const router = useRouter();
+
+  const [{fetching}, searchShow] = useSearchShowMutation();
+  const [, add] = useAddShowMutation();
 
   const handleChange = (e: any) => {
     setVariables({
@@ -36,11 +40,53 @@ const AddShow: React.FC<addShowProps> = ({}) => {
     });
   };
 
+  useEffect(() => {
+    const listener = (event: any) => {
+      if(event.code === 'Enter' || event.code === 'NumpadEnter') {
+        console.log('Enter has been pressed');
+        getShows();
+        document.getElementById("searchBtn")?.focus();
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    }
+  });
+
+  const getShows = async () => {
+    const _seasons = await searchShow({
+      title: variables.title,
+    });
+    const _res = _seasons!.data!.searchShow!.results;
+    setVariables({
+      ...variables,
+      shows: _res,
+    });
+    console.log(_res);
+  }
+
   const getThumbnail = (path: string | null | undefined): any => {
     const _path = variables.imageURL + path;
 
     return <img src={_path}></img>;
   };
+
+  const addShow = async (e: any) => {
+    const _tmdb_id = parseInt(e.target.value) as number;
+    const _show = await add({
+      tmdb_id: _tmdb_id
+    });
+
+    setVariables({
+      ...variables,
+      shows: [],
+      title: ""
+    })
+
+    const _element = document.getElementById("title") as HTMLInputElement;
+    _element.value = "";
+  }
 
   return (
     <Layout variant="regular">
@@ -51,21 +97,12 @@ const AddShow: React.FC<addShowProps> = ({}) => {
           name="title"
           onChange={handleChange}
         ></Input>
-        <Button
+        <Button isLoading={fetching}
           p={2}
           mt={2}
+          id="searchBtn"
           colorScheme="teal"
-          onClick={async () => {
-            const _seasons = await searchShow({
-              title: variables.title,
-            });
-            const _res = _seasons!.data!.searchShow!.results;
-            setVariables({
-              ...variables,
-              shows: _res,
-            });
-            console.log(_res);
-          }}
+          onClick={getShows}
         >
           Search show
         </Button>
@@ -74,7 +111,7 @@ const AddShow: React.FC<addShowProps> = ({}) => {
         <Grid templateColumns="repeat(1,1fr)" p={2} mt={4} gap={5}>
           {variables.shows.map((show) => {
             return (
-              <GridItem p={2} shadow="md" borderWidth="2px">
+              <GridItem key={show.id} p={2} shadow="md" borderWidth="2px">
                 <Flex>
                   {show.poster_path !== null && (
                     <Box w="200px" boxShadow="dark-lg" mr={2}>
@@ -89,7 +126,7 @@ const AddShow: React.FC<addShowProps> = ({}) => {
                     <Text mt={2}>{show.overview}</Text>
                   </Box>
                 </Flex>
-                <Button mt={2} colorScheme="teal" p={2}>
+                <Button value={show.id} onClick={addShow} mt={2} colorScheme="teal" p={2}>
                   <AddIcon mr={2} />
                   Add
                 </Button>

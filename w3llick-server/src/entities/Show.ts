@@ -1,11 +1,9 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 import {
-  PrimaryGeneratedColumn,
   Entity,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Column,
   BaseEntity,
+  PrimaryGeneratedColumn,
+  Column,
 } from "typeorm";
 
 @ObjectType()
@@ -15,39 +13,60 @@ export class Show extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Field(() => String)
-  @CreateDateColumn()
-  createdAt = new Date();
-
-  @Field(() => String)
-  @UpdateDateColumn()
-  updatedAt = new Date();
+  @Field()
+  @Column({nullable: true})
+  backdrop_path: string;
 
   @Field()
-  @Column()
-  year!: string;
+  @Column({nullable: true})
+  first_air_date: string;
 
   @Field()
-  @Column()
-  title!: string;
+  @Column({nullable: true, unique: true})
+  tmdb_id: number;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  posterPath: string;
+  @Field()
+  @Column({nullable: true})
+  in_production: boolean;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  plot: string;
+  @Field({nullable: true})
+  @Column({nullable: true})
+  last_air_date: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  language: string;
+  @Field()
+  @Column({nullable: true})
+  name: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  imdbID: string;
+  @Field()
+  @Column({nullable: true})
+  number_of_episodes: number;
 
-  @Field(() => Int, { nullable: true })
-  @Column({ nullable: true })
-  totalSeasons: number;
+  @Field()
+  @Column({nullable: true})
+  number_of_seasons: number;
+
+  @Field()
+  @Column({nullable: true})
+  overview: string;
+
+  @Field()
+  @Column({nullable: true})
+  poster_path: string;
+
+  @Field()
+  @Column({nullable: true})
+  status: string;
+
+  @Field()
+  @Column({nullable: true})
+  tagline: string;
+
+  @Field()
+  @Column({nullable: true})
+  vote_average: string;
+
+  @Field()
+  @Column({nullable: true})
+  vote_count: number;
+
 }

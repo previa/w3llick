@@ -16,16 +16,23 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { Router, useRouter } from "next/router";
-import { getPosterPath } from "../utils/getPosterPath";
 
 const Index = () => {
   const [variables, setVariables] = useState({
     limit: 12,
     cursor: null as null | string,
+    imageURL: "https://image.tmdb.org/t/p/w400",
   });
   const [{ data, fetching }] = useShowsQuery({
     variables,
   });
+
+  const getThumbnail = (path: string | null | undefined): any => {
+    const _path = variables.imageURL + path;
+    const _style = "outline";
+
+    return <Image src={_path}></Image>;
+  };
 
   const router = useRouter();
 
@@ -42,12 +49,12 @@ const Index = () => {
           {data!.shows.shows.map((s) => (
             <GridItem p={2} key={s.id} shadow="md" borderWidth="2px">
               <Link href={"/show/" + s.id}>
-                <Image src={getPosterPath(s.id)}></Image>
+                {getThumbnail(s.poster_path)}
                 <Box>
                   <Heading mt={2} fontSize="m">
-                    {s.title}
+                    {s.name}
                   </Heading>
-                  <Text mt={4}>{s.year}</Text>
+                  <Text mt={4}>{s.first_air_date.split("-")[0]}</Text>
                 </Box>
               </Link>
             </GridItem>
@@ -59,8 +66,9 @@ const Index = () => {
           <Button
             onClick={() => {
               setVariables({
+                ...variables,
                 limit: variables.limit,
-                cursor: data.shows.shows[data.shows.shows.length - 1].title,
+                cursor: data.shows.shows[data.shows.shows.length - 1].name,
               });
             }}
             isLoading={fetching}
@@ -76,4 +84,4 @@ const Index = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default withUrqlClient(createUrqlClient)(Index);

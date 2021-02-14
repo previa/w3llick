@@ -11,7 +11,7 @@ import {
 } from "type-graphql";
 import { isAuth } from "../middleware/isAuth";
 import { getConnection } from "typeorm";
-import { getShowsFromSearch } from "../utils/tvdbHelper";
+import { getShowsFromSearch, getShowFromTMDB } from "../utils/tvdbHelper";
 import { SearchResult } from "../entities/SearchResult";
 
 // @InputType()
@@ -37,16 +37,16 @@ export class ShowResolver {
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedShows> {
-    const realLimit = Math.min(20, limit);
+    const realLimit = Math.min(50, limit);
     const realLimitPlusOne = realLimit + 1;
     const qb = getConnection()
       .getRepository(Show)
       .createQueryBuilder("s")
-      .orderBy('"title"')
+      .orderBy('"name"')
       .take(realLimitPlusOne);
 
     if (cursor) {
-      qb.where('"title" > :cursor', { cursor });
+      qb.where('"name" > :cursor', { cursor });
     }
 
     const shows = await qb.getMany();
@@ -63,9 +63,35 @@ export class ShowResolver {
   }
 
   @Mutation(() => Show)
-  @UseMiddleware(isAuth)
-  async addShow(@Arg("title") title: string): Promise<Show | null> {
-    console.log(title);
+  async addShow(@Arg("tmdb_id", ()=> Int) tmdb_id: number): Promise<Show | null> {
+    const _resultShow = await getShowFromTMDB(tmdb_id) as Show;
+
+    let _show;
+    // try {
+    //   _show = await Show.create(_resultShow).save();
+    // } catch(error) {
+    //   console.log('error:', error);
+    // }
+
+    try {
+      const result = await getConnection()
+        .createQueryBuilder()
+        .insert()
+        .into(Show)
+        .values(_resultShow)
+        .returning("*")
+        .execute();
+
+      _show = result.raw[0];
+
+      return _show as Show;
+    } catch (err) {
+      if (err.code === "23505") {
+        console.log('Show is already in DB');
+        return null;
+      }
+    }
+
     return null;
   }
 
@@ -84,23 +110,6 @@ export class ShowResolver {
     }
 
     return null;
-  }
-
-  @Mutation(() => Show, { nullable: true })
-  async updatePoster(
-    @Arg("id") id: number,
-    @Arg("posterPath", () => String) posterPath: string
-  ): Promise<Show | null> {
-    const show = await Show.findOne(id);
-    if (!show) {
-      return null;
-    }
-
-    if (typeof posterPath !== "undefined") {
-      await Show.update({ id }, { posterPath });
-    }
-
-    return show;
   }
 
   @Mutation(() => Boolean)
