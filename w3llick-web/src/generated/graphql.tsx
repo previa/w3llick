@@ -41,7 +41,7 @@ export type QueryEpisodeArgs = {
 
 
 export type QueryEpisodesArgs = {
-  showID: Scalars['Int'];
+  id: Scalars['Int'];
 };
 
 export type PaginatedShows = {
@@ -80,15 +80,16 @@ export type User = {
 export type Episode = {
   __typename?: 'Episode';
   id: Scalars['Float'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  releaseDate: Scalars['String'];
-  season: Scalars['Float'];
-  episode: Scalars['Float'];
-  title: Scalars['String'];
-  imdbRating: Scalars['String'];
-  imdbID: Scalars['String'];
-  showID: Scalars['Float'];
+  air_date: Scalars['String'];
+  episode_number: Scalars['Int'];
+  tmdb_id: Scalars['Int'];
+  name: Scalars['String'];
+  overview: Scalars['String'];
+  season_number: Scalars['Float'];
+  still_path: Scalars['String'];
+  vote_average: Scalars['String'];
+  vote_count: Scalars['Int'];
+  show_id: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -100,6 +101,7 @@ export type Mutation = {
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
+  addEpisodes: Array<Episode>;
   deleteEpisode: Scalars['Boolean'];
 };
 
@@ -131,6 +133,11 @@ export type MutationRegisterArgs = {
 
 export type MutationLoginArgs = {
   options: UsernamePasswordInput;
+};
+
+
+export type MutationAddEpisodesArgs = {
+  tmdb_id: Scalars['Int'];
 };
 
 
@@ -185,6 +192,19 @@ export type RegularUserFragment = (
   & Pick<User, 'id' | 'username'>
 );
 
+export type AddEpisodesMutationVariables = Exact<{
+  tmdb_id: Scalars['Int'];
+}>;
+
+
+export type AddEpisodesMutation = (
+  { __typename?: 'Mutation' }
+  & { addEpisodes: Array<(
+    { __typename?: 'Episode' }
+    & Pick<Episode, 'id' | 'air_date' | 'episode_number' | 'tmdb_id' | 'name' | 'overview' | 'season_number' | 'still_path' | 'vote_average' | 'vote_count'>
+  )> }
+);
+
 export type AddShowMutationVariables = Exact<{
   tmdb_id: Scalars['Int'];
 }>;
@@ -194,7 +214,7 @@ export type AddShowMutation = (
   { __typename?: 'Mutation' }
   & { addShow: (
     { __typename?: 'Show' }
-    & Pick<Show, 'id'>
+    & Pick<Show, 'id' | 'number_of_seasons'>
   ) }
 );
 
@@ -271,7 +291,7 @@ export type EpisodesQuery = (
   { __typename?: 'Query' }
   & { episodes: Array<(
     { __typename?: 'Episode' }
-    & Pick<Episode, 'id' | 'title' | 'episode' | 'season' | 'imdbID' | 'imdbRating' | 'releaseDate'>
+    & Pick<Episode, 'id' | 'air_date' | 'episode_number' | 'tmdb_id' | 'name' | 'overview' | 'season_number' | 'still_path' | 'vote_average' | 'vote_count' | 'show_id'>
   )> }
 );
 
@@ -323,10 +343,31 @@ export const RegularUserFragmentDoc = gql`
   username
 }
     `;
+export const AddEpisodesDocument = gql`
+    mutation AddEpisodes($tmdb_id: Int!) {
+  addEpisodes(tmdb_id: $tmdb_id) {
+    id
+    air_date
+    episode_number
+    tmdb_id
+    name
+    overview
+    season_number
+    still_path
+    vote_average
+    vote_count
+  }
+}
+    `;
+
+export function useAddEpisodesMutation() {
+  return Urql.useMutation<AddEpisodesMutation, AddEpisodesMutationVariables>(AddEpisodesDocument);
+};
 export const AddShowDocument = gql`
     mutation AddShow($tmdb_id: Int!) {
   addShow(tmdb_id: $tmdb_id) {
     id
+    number_of_seasons
   }
 }
     `;
@@ -407,14 +448,18 @@ export function useSearchShowMutation() {
 };
 export const EpisodesDocument = gql`
     query Episodes($id: Int!) {
-  episodes(showID: $id) {
+  episodes(id: $id) {
     id
-    title
-    episode
-    season
-    imdbID
-    imdbRating
-    releaseDate
+    air_date
+    episode_number
+    tmdb_id
+    name
+    overview
+    season_number
+    still_path
+    vote_average
+    vote_count
+    show_id
   }
 }
     `;

@@ -1,14 +1,5 @@
-import { ObjectType, Field } from "type-graphql";
-import {
-  Entity,
-  BaseEntity,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Column,
-  ManyToOne,
-} from "typeorm";
-import { Show } from "./Show";
+import { ObjectType, Field, Int } from "type-graphql";
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @ObjectType()
 @Entity()
@@ -17,39 +8,43 @@ export class Episode extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Field(() => String)
-  @CreateDateColumn()
-  createdAt = new Date();
-
-  @Field(() => String)
-  @UpdateDateColumn()
-  updatedAt = new Date();
-
-  @Field()
+  @Field({ nullable: true })
   @Column()
-  releaseDate: string;
+  air_date: string;
 
-  @Field()
+  @Field(() => Int)
   @Column()
-  season!: number;
+  episode_number: number;
 
-  @Field()
-  @Column()
-  episode!: number;
-
-  @Field()
-  @Column()
-  title!: string;
-
-  @Field()
-  @Column()
-  imdbRating: string;
-
-  @Field()
+  @Field(() => Int)
   @Column({ unique: true })
-  imdbID!: string;
+  tmdb_id: number;
 
   @Field()
   @Column()
-  showID: number;
+  name: string;
+
+  @Field()
+  @Column()
+  overview: string;
+
+  @Field()
+  @Column()
+  season_number: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  still_path: string;
+
+  @Field()
+  @Column()
+  vote_average: string;
+
+  @Field(() => Int)
+  @Column()
+  vote_count: number;
+
+  @Field(() => Int)
+  @Column()
+  show_id: number;
 }

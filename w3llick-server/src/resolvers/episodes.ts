@@ -1,5 +1,7 @@
 import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
 import { Episode } from "../entities/Episode";
+import { getShowEpisodes } from "../utils/tvdbHelper";
+import { Show } from "../entities/Show";
 
 @Resolver()
 export class EpisodeResolver {
@@ -10,52 +12,24 @@ export class EpisodeResolver {
 
   @Query(() => [Episode])
   async episodes(
-    @Arg("showID", () => Int) showID: number
+    @Arg("id", () => Int) id: number
   ): Promise<Episode[] | null> {
-    return await Episode.find({ showID });
+    const _ep = await Episode.find({show_id: id});
+
+    return _ep as Episode[];
   }
 
-  // @Mutation(() => [Episode])
-  // async updateEpisodes(
-  //   @Arg("showID", () => Int) showID: number
-  // ): Promise<Episode[] | null> {
-  //   const _show = await Show.findOne(showID);
+  @Mutation(() => [Episode])
+  async addEpisodes(
+    @Arg("tmdb_id", () => Int) tmdb_id: number,
+  ): Promise<Episode[] | null> {
+    const _show = await Show.findOne({tmdb_id});
+    const _episodes = await getShowEpisodes(_show!.id, _show!.tmdb_id, _show!.number_of_seasons) as Episode[];
+  
+    await Episode.save(_episodes);
 
-  //   if (!_show) {
-  //     return null;
-  //   }
-
-  //   const nrOfSeasons = _show.totalSeasons;
-
-  //   for (let i = 1; i < nrOfSeasons + 1; i++) {
-  //     const _seasons = await getSeasonWithTVDB(_show, i);
-
-  //     console.log(_seasons);
-
-  //     _seasons?.forEach(async (eps: Episode) => {
-  //       let ep = await Episode.findOne({ imdbID: eps.imdbID });
-
-  //       if (ep) {
-  //         await Episode.update(
-  //           {
-  //             id: ep.id,
-  //           },
-  //           {
-  //             ...eps,
-  //           }
-  //         );
-  //       } else {
-  //         await Episode.create({
-  //           ...eps,
-  //         }).save();
-  //       }
-  //     });
-  //   }
-
-  //   const _episodes = await Episode.find({ showID });
-
-  //   return _episodes;
-  // }
+    return await Episode.find({show_id: _show!.id});
+  }
 
   @Mutation(() => Boolean)
   async deleteEpisode(@Arg("id") id: number): Promise<boolean> {

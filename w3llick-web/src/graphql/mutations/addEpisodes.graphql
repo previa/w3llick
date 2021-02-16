@@ -1,7 +1,7 @@
-query Episodes($id: Int!) {
-	episodes(id: $id) {
+mutation AddEpisodes($tmdb_id: Int!) {
+  addEpisodes(tmdb_id: $tmdb_id) {
     id
-		air_date
+    air_date
     episode_number
     tmdb_id
     name
@@ -10,6 +10,5 @@ query Episodes($id: Int!) {
     still_path
     vote_average
     vote_count
-    show_id
   }
 }

@@ -12,58 +12,50 @@ import {
   Tbody,
 } from "@chakra-ui/react";
 import React from "react";
-import { Episode, EpisodesQuery, useEpisodesQuery } from "../generated/graphql";
+import { Episode } from "../generated/graphql";
 
 interface SeasonHolderProps {
-  seasons: number;
-  showID: number;
+  seasons: any[];
 }
 
 export const SeasonHolder: React.FC<SeasonHolderProps> = ({
   seasons,
-  showID,
 }) => {
-  console.log(seasons, " and ", showID);
+  const currentDate = new Date();
 
-  const [{ data, fetching }] = useEpisodesQuery({
-    variables: {
-      id: showID,
-    },
-  });
-
-  if (fetching) {
-    return (
-      <div>
-        <Text>Loading...</Text>
-      </div>
-    );
+  const getEpisodeColor = (date: string): string => {
+    const epDate = new Date(date);
+    if(epDate < currentDate) {
+      return "red.200";
+    } else {
+      return "yellow.500";
+    }
   }
 
-  if (data?.episodes) {
-    let _seasons = [];
-
-    for (let i = 1; i < seasons + 1; i++) {
-      _seasons[i] = data.episodes
-        .filter((e) => {
-          return e.season === i;
-        })
-        .sort((a, b) => 0 - (a.episode < b.episode ? 1 : -1));
+  const getAirDateToString = (date: string): string => {
+    const epDate = new Date(date);
+    // TODO: DO DECENT TIME MANAGEMENT
+    if(epDate.toDateString() === 'Invalid Date') {
+      return "Unkown"
     }
+    return epDate.toDateString();
+  }
 
+  if (seasons) {
     return (
       <Grid mt={2} w="100%" templateColumns="repeat(1,1fr)" gap={5}>
-        {_seasons.map((s, index) => {
+        {seasons.reverse().map((s, index) => {
           return (
             <GridItem
-              key={"season" + index}
+              key={"season" + (seasons.length - index - 1)}
               p={2}
               shadow="dark-lg"
               borderWidth="2px"
             >
               <Heading mt={2} mb={2} ml={2}>
-                {"Season " + index}
+                {"Season " + (seasons.length - index - 1)}
               </Heading>
-              <Table size="sm" variant="striped" colorScheme="messenger">
+              <Table size="sm" colorScheme="gray">
                 <Thead>
                   <Tr>
                     <Th>#</Th>
@@ -73,13 +65,13 @@ export const SeasonHolder: React.FC<SeasonHolderProps> = ({
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {s.map((ep) => {
+                  {s.map((ep: Episode) => {
                     return (
-                      <Tr key={ep.imdbID}>
-                        <Td>{ep.episode}</Td>
-                        <Td>{ep.title}</Td>
-                        <Td>{ep.releaseDate}</Td>
-                        <Td>1080p</Td>
+                      <Tr backgroundColor={getEpisodeColor(ep.air_date)} key={ep.tmdb_id}>
+                        <Td>{ep.episode_number}</Td>
+                        <Td>{ep.name}</Td>
+                        <Td>{getAirDateToString(ep.air_date)}</Td>
+                        <Td></Td>
                       </Tr>
                     );
                   })}

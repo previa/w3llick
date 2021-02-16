@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import { SearchResult } from "../entities/SearchResult";
 import { TMDB_KEY } from "../keys";
 import { Show } from "../entities/Show";
+import { Episode } from "src/entities/Episode";
 
 export async function getShowsFromSearch(show: string): Promise<SearchResult> {
   const shows = await fetch(
@@ -23,6 +24,49 @@ export async function getShowsFromSearch(show: string): Promise<SearchResult> {
   return shows as SearchResult;
 }
 
+export async function getShowEpisodes(
+  id: number,
+  tmdb_id: number,
+  seasons: number
+): Promise<Episode[] | null> {
+  let episodes = [] as Episode[];
+
+  for (let i = 1; i < seasons + 1; i++) {
+    let e = await fetch(
+      "https://api.themoviedb.org/3/tv/" +
+        tmdb_id +
+        "/season/" +
+        i +
+        "?api_key=" +
+        TMDB_KEY +
+        "&language=en-US",
+      {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res) => {
+      return res.json();
+    });
+    
+    e.episodes.forEach((ep: Episode) => {
+      episodes.push(ep);
+    })
+  }
+
+  episodes.forEach((ep: any) => {
+    delete ep.crew;
+    delete ep.guest_stars;
+    delete ep.production_code;
+    ep.tmdb_id = ep.id;
+    ep.show_id = id;
+    delete ep.id;
+  });
+
+  return episodes as Episode[];
+}
+
 export async function getShowFromTMDB(id: number): Promise<Show | null> {
   let show = await fetch(
     "https://api.themoviedb.org/3/tv/" +
@@ -30,12 +74,12 @@ export async function getShowFromTMDB(id: number): Promise<Show | null> {
       "?api_key=" +
       TMDB_KEY +
       "&language=en-US",
-      {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
+    {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
   ).then((res) => {
     return res.json();
   });
@@ -44,7 +88,6 @@ export async function getShowFromTMDB(id: number): Promise<Show | null> {
   delete show.created_by;
   delete show.episode_run_time;
   delete show.genres;
-  delete show.seasons;
   delete show.production_companies;
   delete show.production_countries;
   delete show.spoken_languages;
@@ -58,7 +101,7 @@ export async function getShowFromTMDB(id: number): Promise<Show | null> {
   delete show.languages;
   delete show.hompage;
   delete show.origin_country;
-  
+
   show.tmdb_id = show.id;
   delete show.id;
   return show as Show;

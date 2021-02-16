@@ -13,20 +13,20 @@ export class Show extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Field()
+  @Field({nullable: true})
   @Column({nullable: true})
   backdrop_path: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   first_air_date: string;
 
   @Field()
-  @Column({nullable: true, unique: true})
+  @Column({unique: true})
   tmdb_id: number;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   in_production: boolean;
 
   @Field({nullable: true})
@@ -34,39 +34,39 @@ export class Show extends BaseEntity {
   last_air_date: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   name: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   number_of_episodes: number;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   number_of_seasons: number;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   overview: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   poster_path: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   status: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   tagline: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   vote_average: string;
 
   @Field()
-  @Column({nullable: true})
+  @Column()
   vote_count: number;
 
 }

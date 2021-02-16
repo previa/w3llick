@@ -7,9 +7,7 @@ import {
   ObjectType,
   Query,
   Resolver,
-  UseMiddleware,
 } from "type-graphql";
-import { isAuth } from "../middleware/isAuth";
 import { getConnection } from "typeorm";
 import { getShowsFromSearch, getShowFromTMDB } from "../utils/tvdbHelper";
 import { SearchResult } from "../entities/SearchResult";
@@ -67,11 +65,6 @@ export class ShowResolver {
     const _resultShow = await getShowFromTMDB(tmdb_id) as Show;
 
     let _show;
-    // try {
-    //   _show = await Show.create(_resultShow).save();
-    // } catch(error) {
-    //   console.log('error:', error);
-    // }
 
     try {
       const result = await getConnection()
