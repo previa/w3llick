@@ -39,6 +39,11 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
               Add show
             </Button>
           </NextLink>
+          <NextLink href="/settings">
+            <Button as={Link} mr={2} colorScheme="teal">
+              Settings
+            </Button>
+          </NextLink>
           <Box mr={4} color="white">
             {data.me.username}
           </Box>
@@ -61,7 +66,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
       <Flex align="center" m={"auto"} flex={1} maxW={800}>
         <NextLink href="/">
           <Link>
-            <Heading color="white">W3llick</Heading>
+            <Heading color="white">W3LLICK</Heading>
           </Link>
         </NextLink>
         <Box ml={"auto"}>{body}</Box>

@@ -1,13 +1,12 @@
 import fetch from "node-fetch";
 import { SearchResult } from "../entities/SearchResult";
-import { TMDB_KEY } from "../keys";
 import { Show } from "../entities/Show";
 import { Episode } from "src/entities/Episode";
 
-export async function getShowsFromSearch(show: string): Promise<SearchResult> {
+export async function getShowsFromSearch(show: string, tmdb_key: string): Promise<SearchResult> {
   const shows = await fetch(
     "https://api.themoviedb.org/3/search/tv?api_key=" +
-      TMDB_KEY +
+    tmdb_key +
       "&language=en-US&page=1&query=" +
       show +
       "&include_adult=false",
@@ -27,7 +26,8 @@ export async function getShowsFromSearch(show: string): Promise<SearchResult> {
 export async function getShowEpisodes(
   id: number,
   tmdb_id: number,
-  seasons: number
+  seasons: number,
+  tmdb_key: string
 ): Promise<Episode[] | null> {
   let episodes = [] as Episode[];
 
@@ -38,7 +38,7 @@ export async function getShowEpisodes(
         "/season/" +
         i +
         "?api_key=" +
-        TMDB_KEY +
+        tmdb_key +
         "&language=en-US",
       {
         method: "get",
@@ -67,12 +67,12 @@ export async function getShowEpisodes(
   return episodes as Episode[];
 }
 
-export async function getShowFromTMDB(id: number): Promise<Show | null> {
+export async function getShowFromTMDB(id: number, tmdb_key: string): Promise<Show | null> {
   let show = await fetch(
     "https://api.themoviedb.org/3/tv/" +
       id +
       "?api_key=" +
-      TMDB_KEY +
+      tmdb_key +
       "&language=en-US",
     {
       method: "get",

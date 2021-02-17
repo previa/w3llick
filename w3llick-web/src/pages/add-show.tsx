@@ -86,6 +86,8 @@ const AddShow: React.FC<addShowProps> = ({}) => {
       tmdb_id: _tmdb_id,
     });
 
+    console.log(_show);
+
     const _episodes = await addEpisodes({
       tmdb_id: _tmdb_id,
     });

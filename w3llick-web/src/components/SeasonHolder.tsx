@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { Episode } from "../generated/graphql";
+import { getAirDateToString } from "../utils/getAirDateToString";
 
 interface SeasonHolderProps {
   seasons: any[];
@@ -32,15 +33,6 @@ export const SeasonHolder: React.FC<SeasonHolderProps> = ({
     }
   }
 
-  const getAirDateToString = (date: string): string => {
-    const epDate = new Date(date);
-    // TODO: DO DECENT TIME MANAGEMENT
-    if(epDate.toDateString() === 'Invalid Date') {
-      return "Unkown"
-    }
-    return epDate.toDateString();
-  }
-
   if (seasons) {
     return (
       <Grid mt={2} w="100%" templateColumns="repeat(1,1fr)" gap={5}>
@@ -55,11 +47,11 @@ export const SeasonHolder: React.FC<SeasonHolderProps> = ({
               <Heading mt={2} mb={2} ml={2}>
                 {"Season " + (seasons.length - index - 1)}
               </Heading>
-              <Table size="sm" colorScheme="gray">
+              <Table alignContent="center" size="sm" colorScheme="gray">
                 <Thead>
                   <Tr>
                     <Th>#</Th>
-                    <Th>Title</Th>
+                    <Th w="400px">Title</Th>
                     <Th>Aired</Th>
                     <Th>Status</Th>
                   </Tr>
@@ -70,7 +62,7 @@ export const SeasonHolder: React.FC<SeasonHolderProps> = ({
                       <Tr backgroundColor={getEpisodeColor(ep.air_date)} key={ep.tmdb_id}>
                         <Td>{ep.episode_number}</Td>
                         <Td>{ep.name}</Td>
-                        <Td>{getAirDateToString(ep.air_date)}</Td>
+                        <Td>{getAirDateToString(new Date(ep.air_date), currentDate)}</Td>
                         <Td></Td>
                       </Tr>
                     );

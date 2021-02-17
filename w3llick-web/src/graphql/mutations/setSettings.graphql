@@ -1,0 +1,5 @@
+mutation SetSettings($tmdb_key: String!) {
+  setSettings(tmdb_key: $tmdb_key) {
+    tmdb_key
+  }
+}

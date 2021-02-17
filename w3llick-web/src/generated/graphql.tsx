@@ -21,6 +21,7 @@ export type Query = {
   me?: Maybe<User>;
   episode?: Maybe<Episode>;
   episodes: Array<Episode>;
+  settings?: Maybe<Setting>;
 };
 
 
@@ -53,7 +54,7 @@ export type PaginatedShows = {
 export type Show = {
   __typename?: 'Show';
   id: Scalars['Float'];
-  backdrop_path: Scalars['String'];
+  backdrop_path?: Maybe<Scalars['String']>;
   first_air_date: Scalars['String'];
   tmdb_id: Scalars['Float'];
   in_production: Scalars['Boolean'];
@@ -80,16 +81,21 @@ export type User = {
 export type Episode = {
   __typename?: 'Episode';
   id: Scalars['Float'];
-  air_date: Scalars['String'];
+  air_date?: Maybe<Scalars['String']>;
   episode_number: Scalars['Int'];
   tmdb_id: Scalars['Int'];
   name: Scalars['String'];
   overview: Scalars['String'];
   season_number: Scalars['Float'];
-  still_path: Scalars['String'];
+  still_path?: Maybe<Scalars['String']>;
   vote_average: Scalars['String'];
   vote_count: Scalars['Int'];
   show_id: Scalars['Int'];
+};
+
+export type Setting = {
+  __typename?: 'Setting';
+  tmdb_key?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -103,6 +109,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   addEpisodes: Array<Episode>;
   deleteEpisode: Scalars['Boolean'];
+  setSettings: Setting;
 };
 
 
@@ -143,6 +150,11 @@ export type MutationAddEpisodesArgs = {
 
 export type MutationDeleteEpisodeArgs = {
   id: Scalars['Float'];
+};
+
+
+export type MutationSetSettingsArgs = {
+  tmdb_key: Scalars['String'];
 };
 
 export type SearchResult = {
@@ -282,6 +294,19 @@ export type SearchShowMutation = (
   ) }
 );
 
+export type SetSettingsMutationVariables = Exact<{
+  tmdb_key: Scalars['String'];
+}>;
+
+
+export type SetSettingsMutation = (
+  { __typename?: 'Mutation' }
+  & { setSettings: (
+    { __typename?: 'Setting' }
+    & Pick<Setting, 'tmdb_key'>
+  ) }
+);
+
 export type EpisodesQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -303,6 +328,17 @@ export type MeQuery = (
   & { me?: Maybe<(
     { __typename?: 'User' }
     & RegularUserFragment
+  )> }
+);
+
+export type SettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SettingsQuery = (
+  { __typename?: 'Query' }
+  & { settings?: Maybe<(
+    { __typename?: 'Setting' }
+    & Pick<Setting, 'tmdb_key'>
   )> }
 );
 
@@ -446,6 +482,17 @@ export const SearchShowDocument = gql`
 export function useSearchShowMutation() {
   return Urql.useMutation<SearchShowMutation, SearchShowMutationVariables>(SearchShowDocument);
 };
+export const SetSettingsDocument = gql`
+    mutation SetSettings($tmdb_key: String!) {
+  setSettings(tmdb_key: $tmdb_key) {
+    tmdb_key
+  }
+}
+    `;
+
+export function useSetSettingsMutation() {
+  return Urql.useMutation<SetSettingsMutation, SetSettingsMutationVariables>(SetSettingsDocument);
+};
 export const EpisodesDocument = gql`
     query Episodes($id: Int!) {
   episodes(id: $id) {
@@ -477,6 +524,17 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const SettingsDocument = gql`
+    query Settings {
+  settings {
+    tmdb_key
+  }
+}
+    `;
+
+export function useSettingsQuery(options: Omit<Urql.UseQueryArgs<SettingsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<SettingsQuery>({ query: SettingsDocument, ...options });
 };
 export const ShowDocument = gql`
     query Show($id: Int!) {

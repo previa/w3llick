@@ -2,3 +2,4 @@
 /src/keys.ts
 yarn-error.log*
 /dist/
+settings.json

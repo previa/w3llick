@@ -2,6 +2,8 @@ import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
 import { Episode } from "../entities/Episode";
 import { getShowEpisodes } from "../utils/tvdbHelper";
 import { Show } from "../entities/Show";
+import { getSettings } from "../utils/settingsHelper";
+import { Setting } from "../entities/Setting";
 
 @Resolver()
 export class EpisodeResolver {
@@ -24,7 +26,8 @@ export class EpisodeResolver {
     @Arg("tmdb_id", () => Int) tmdb_id: number,
   ): Promise<Episode[] | null> {
     const _show = await Show.findOne({tmdb_id});
-    const _episodes = await getShowEpisodes(_show!.id, _show!.tmdb_id, _show!.number_of_seasons) as Episode[];
+    const _settings = await getSettings() as Setting;
+    const _episodes = await getShowEpisodes(_show!.id, _show!.tmdb_id, _show!.number_of_seasons, _settings.tmdb_key) as Episode[];
   
     await Episode.save(_episodes);
 

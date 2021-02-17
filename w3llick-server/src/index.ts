@@ -14,6 +14,8 @@ import { User } from "./entities/User";
 import path from "path";
 import { Episode } from "./entities/Episode";
 import { EpisodeResolver } from "./resolvers/episodes";
+import { SettingResolver } from "./resolvers/settings";
+import { Setting } from "./entities/Setting";
 
 // rerun
 const main = async () => {
@@ -24,7 +26,7 @@ const main = async () => {
     password: "postgres",
     logging: true,
     synchronize: true,
-    entities: [Show, User, Episode],
+    entities: [Show, User, Episode, Setting],
     migrations: [path.join(__dirname, "./migrations/*")],
   });
 
@@ -81,7 +83,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [ShowResolver, UserResolver, EpisodeResolver],
+      resolvers: [ShowResolver, UserResolver, EpisodeResolver, SettingResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({ req, res }),

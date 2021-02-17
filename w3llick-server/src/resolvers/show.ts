@@ -11,14 +11,8 @@ import {
 import { getConnection } from "typeorm";
 import { getShowsFromSearch, getShowFromTMDB } from "../utils/tvdbHelper";
 import { SearchResult } from "../entities/SearchResult";
-
-// @InputType()
-// class ShowInput {
-//   @Field()
-//   title: string;
-//   @Field()
-//   year: string;
-// }
+import { getSettings } from "../utils/settingsHelper";
+import { Setting } from "../entities/Setting";
 
 @ObjectType()
 class PaginatedShows {
@@ -62,7 +56,8 @@ export class ShowResolver {
 
   @Mutation(() => Show)
   async addShow(@Arg("tmdb_id", ()=> Int) tmdb_id: number): Promise<Show | null> {
-    const _resultShow = await getShowFromTMDB(tmdb_id) as Show;
+    const _settings = await getSettings() as Setting;
+    const _resultShow = await getShowFromTMDB(tmdb_id, _settings.tmdb_key) as Show;
 
     let _show;
 
@@ -90,7 +85,8 @@ export class ShowResolver {
 
   @Mutation(() => SearchResult)
   async searchShow(@Arg("title") title: string): Promise<SearchResult> {
-    const _searchResult = await getShowsFromSearch(title);
+    const _settings = await getSettings() as Setting;
+    const _searchResult = await getShowsFromSearch(title, _settings.tmdb_key);
     return _searchResult;
   }
 
